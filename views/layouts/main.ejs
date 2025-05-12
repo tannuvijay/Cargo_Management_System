@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cargo Management System</title>
+  
+  <style>
+    /* General Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* Background styling */
+    body {
+      height: 100vh;
+      margin: 0;
+      overflow: hidden;
+      background: radial-gradient(circle, #011307, #001736); /* Dark blue gradient */
+      font-family: 'Arial', sans-serif;
+    }
+
+    /* Starry Background */
+    .stars {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: transparent;
+      z-index: 1;
+    }
+
+    /* Shining stars effect */
+    .star {
+      width: 3px;
+      height: 3px;
+      position: absolute;
+      background: white;
+      border-radius: 50%;
+      opacity: 0.8;
+      animation: twinkling 2s infinite ease-in-out;
+    }
+
+    @keyframes twinkling {
+      0%, 100% {
+        opacity: 0.4;
+      }
+      50% {
+        opacity: 1;
+      }
+    }
+
+    /* Centered Box */
+    .box {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: linear-gradient(45deg, #1a1a2e, #16213e, #0f3460);
+      padding: 40px;
+      border-radius: 15px;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0px 4px 30px rgba(0, 0, 0, 0.3);
+      z-index: 2;
+      text-align: center;
+    }
+
+    /* Header Text Styling */
+    h1 {
+      font-size: 28px;
+      color: #dacbcb;
+      margin-bottom: 20px;
+      font-weight: bold;
+      text-shadow: 0 0 5px rgba(255, 255, 255, 0.7);
+    }
+
+    /* Navigation Styling */
+    nav ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    nav ul li {
+      margin: 15px 0;
+    }
+
+    nav ul li a {
+      text-decoration: none;
+      font-size: 18px;
+      color: #fff;
+      padding: 10px 20px;
+      background-color: #007bff;
+      border-radius: 5px;
+      transition: background-color 0.3s, color 0.3s;
+      display: inline-block;
+    }
+
+    nav ul li a:hover {
+      background-color: #0056b3;
+      color: white;
+    }
+
+    /* Footer Styling */
+    footer {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 14px;
+      color: white;
+    }
+
+    /* Result Styling */
+    #upload-result {
+      margin-top: 20px;
+      color: #fff;
+      font-size: 16px;
+    }
+
+  </style>
+</head>
+<body>
+  <!-- Starry Background -->
+  <div class="stars" id="stars"></div>
+
+  <header>
+    <!-- Box Container -->
+    <div class="box">
+      <h1>Cargo Management System</h1>
+      <nav>
+        <ul>
+          <li><a href="/dashboard">Dashboard</a></li>
+          <li><a href="/placement">Placement</a></li>
+          <li><a href="/waste">Waste Management</a></li>
+          <li><a href="/logs">Logs</a></li>
+          <!-- <li><a href="/simulate">Simulate Day</a></li> -->
+        </ul>
+      </nav>
+
+      <section>
+        <h2>Upload CSV Files</h2>
+        
+        <!-- Upload Containers -->
+        <form id="upload-containers-form" action="/api/csv/upload/containers" method="POST" enctype="multipart/form-data">
+          <input type="file" name="file" />
+          <button type="submit">Upload</button>
+        </form>
+        <div id="upload-result"></div> <!-- Display upload response -->
+      </section>
+    </div>
+  </header>
+
+  <footer>
+    <p>&copy; 2025 Space Exploration Co.</p>
+  </footer>
+
+  <script>
+    // Handle Upload Containers form submission via JavaScript
+    document.getElementById('upload-containers-form').addEventListener('submit', async (e) => {
+      e.preventDefault(); // Prevent default form submission
+      const formData = new FormData(e.target);
+
+      try {
+        const response = await fetch('/api/csv/upload/containers', {
+          method: 'POST',
+          body: formData,
+        });
+        const result = await response.json();
+        document.getElementById('upload-result').innerText = result.message;
+      } catch (error) {
+        console.error('Error uploading containers:', error);
+        document.getElementById('upload-result').innerText = 'Error uploading file. Please try again.';
+      }
+    });
+
+    // Generate starry background
+    const starsContainer = document.getElementById('stars');
+    const numStars = 100; // Number of stars
+
+    for (let i = 0; i < numStars; i++) {
+      const star = document.createElement('div');
+      star.classList.add('star');
+      star.style.top = Math.random() * 100 + '%'; // Random vertical position
+      star.style.left = Math.random() * 100 + '%'; // Random horizontal position
+      starsContainer.appendChild(star);
+    }
+  </script>
+</body>
+</html>

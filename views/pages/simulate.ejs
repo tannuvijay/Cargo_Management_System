@@ -1,0 +1,31 @@
+<% include('../layouts/main.ejs') %>
+<section>
+  <h2>Simulate Day</h2>
+  <button id="simulate-day" class="btn btn-dark">Simulate Day</button>
+  <div id="simulation-result" class="mt-4"></div>
+</section>
+<script>
+  const simulateDayBtn = document.getElementById("simulate-day");
+  simulateDayBtn.addEventListener("click", async () => {
+    try {
+      const response = await fetch('/api/simulate/day', { method: 'POST' });
+      const data = await response.json();
+      
+      const resultDiv = document.getElementById("simulation-result");
+      resultDiv.innerHTML = `
+        <h3>Simulation Result:</h3>
+        <p>${data.message}</p>
+        <h4>Expired Items:</h4>
+        <ul>
+          ${data.simulationResult.expiredItems.map(item => `<li>${item.name} (${item.reason})</li>`).join("")}
+        </ul>
+        <h4>Updated Items:</h4>
+        <ul>
+          ${data.simulationResult.updatedItems.map(item => `<li>${item.name} (Remaining Uses: ${item.remainingUses})</li>`).join("")}
+        </ul>
+      `;
+    } catch (error) {
+      console.error('Error simulating day:', error);
+    }
+  });
+</script>

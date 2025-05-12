@@ -1,0 +1,21 @@
+Zone,Container ID,Width(cm),Depth(cm),Height(cm)
+Crew Quarters,contA1,100,85,200
+Airlock,contB1,50,85,200
+Laboratory,contC1,200,85,200
+Crew Quarters,contA2,120,90,210
+Airlock,contB2,60,80,190
+Laboratory,contC2,210,95,220
+Crew Quarters,contA3,110,88,205
+Airlock,contB3,55,85,195
+Laboratory,contC3,205,90,215
+Crew Quarters,contA4,130,87,215
+Airlock,contB4,65,83,185
+Laboratory,contC4,220,98,230
+Crew Quarters,contA5,105,86,202
+Airlock,contB5,52,84,198
+Laboratory,contC5,210,97,225
+Crew Quarters,contA6,125,92,212
+Airlock,contB6,63,82,192
+Laboratory,contC6,215,93,218
+Crew Quarters,contA7,115,89,207
+Airlock,contB7,58,81,187

@@ -1,0 +1,322 @@
+
+
+<% include('../layouts/main.ejs') %>
+
+<style>
+  /* General Reset */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  /* Background styling */
+ 
+  body {
+    height: 100vh;
+    color: #dacbcb;
+    margin: 0;
+    background: radial-gradient(circle, #011307, #001736);
+    font-family: 'Arial', sans-serif;
+    overflow-y: auto; /* ✅ ALLOW vertical scrolling */
+    overflow-x: hidden; /* 🔒 Keep horizontal scroll hidden */
+  }
+  
+  .stars {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  .star {
+    width: 3px;
+    height: 3px;
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+    opacity: 0.8;
+    animation: twinkling 2s infinite ease-in-out;
+  }
+
+  @keyframes twinkling {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+  }
+
+  /* Headings */
+  h2 {
+    text-align: center;
+    margin: 40px 0 20px;
+    font-size: 26px;
+    color: #ffffff;
+    text-shadow: 0 0 6px rgba(255, 255, 255, 0.6);
+  }
+
+  /* Form Styling */
+  form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 10px;
+    max-width: 500px;
+    margin: 0 auto;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
+  }
+
+  label {
+    font-size: 16px;
+    color: #f0e6e6;
+  }
+
+  input[type="file"] {
+    border: 1px solid #ccc;
+    padding: 8px;
+    background: #0a1f3c;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  .btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s ease;
+    box-shadow: 0 0 10px rgba(0, 153, 255, 0.2);
+  }
+
+  .btn-primary {
+    background: linear-gradient(to right, #00c6ff, #0072ff);
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background: linear-gradient(to right, #0072ff, #00c6ff);
+  }
+
+  .btn-secondary {
+    background: linear-gradient(to right, #ff7e5f, #feb47b);
+    color: white;
+  }
+
+  .btn-secondary:hover {
+    background: linear-gradient(to right, #feb47b, #ff7e5f);
+  }
+
+  /* Table Wrapper */
+  #items-preview, #placement-recommendations {
+    background: rgba(255, 255, 255, 0.02);
+    padding: 20px;
+    border-radius: 12px;
+    margin: 0 auto;
+    width: 90%;
+    max-width: 1000px;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
+    max-height: 400px; /* or any height you want */
+    overflow-y: auto;  /* ✅ Internal scroll if content is too long */
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+  }
+
+  th, td {
+    padding: 12px;
+    border: 1px solid #555;
+    color: #e0dcdc;
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.03);
+  }
+
+  th {
+    background: rgba(0, 123, 255, 0.3);
+    font-weight: bold;
+    color: #ffffff;
+  }
+
+  /* Empty message styling */
+  .empty-message {
+    color: #ffdddd;
+    text-align: center;
+    font-size: 16px;
+    margin-top: 20px;
+    font-style: italic;
+  }
+
+  footer {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 14px;
+    color: white;
+  }
+</style>
+
+<section>
+  <div class="stars" id="stars"></div>
+  <h2>Upload Item CSV</h2>
+  <form id="upload-items-form" enctype="multipart/form-data">
+    <label for="items-file">Upload Items CSV:</label>
+    <input type="file" id="items-file" name="file" accept=".csv" required>
+    <button type="submit" class="btn btn-primary">Upload Items</button>
+  </form> 
+</section>
+<section>
+  <div class="stars" id="stars"></div>
+
+  <!-- Button to Fetch Placement Recommendations -->
+  <h2>Placement Recommendations</h2>
+  <button id="placement-recommendations-btn" class="btn btn-secondary">Get Recommendations</button>
+
+  <!-- Scrollable Placement Table (Initially Hidden) -->
+  <div id="placement-recommendations" style="display: none; max-height: 80%; overflow-y: auto; border: 1px solid #ccc; margin-top: 20px;">
+    <table style="width: 100%; border-collapse: collapse;">
+      <thead>
+        <tr>
+          <th>Item ID</th>
+          <th>Item Name</th>
+          <th>Container ID</th>
+          <th>Start Coordinates</th>
+          <th>End Coordinates</th>
+          <th>Retrieval Steps</th>
+        </tr>
+      </thead>
+      <tbody id="placement-table-body"></tbody>
+    </table>
+  </div>
+
+  <div class="empty-message" id="no-placements-message" style="display: none;">
+    No placement data available. Please generate placement recommendations.
+  </div>
+</section>
+
+<script>
+  // Handle placement recommendations button
+  document.getElementById('placement-recommendations-btn').addEventListener('click', async () => {
+    try {
+      const response = await fetch('/api/items/placement', { method: 'POST' });
+      const data = await response.json();
+
+      if (data.placements && data.placements.length > 0) {
+        // Show the table structure dynamically
+        document.getElementById('placement-recommendations').style.display = 'block';
+        document.getElementById('no-placements-message').style.display = 'none';
+        displayPlacementRecommendations(data.placements);
+      } else {
+        // Hide the table and show the no placements message
+        document.getElementById('placement-recommendations').style.display = 'none';
+        document.getElementById('no-placements-message').style.display = 'block';
+      }
+    } catch (error) {
+      console.error('Error fetching placement recommendations:', error.message);
+      alert('Failed to fetch placement recommendations.');
+    }
+  });
+
+  // Function to display placement recommendations in the table
+  function displayPlacementRecommendations(placements) {
+    const placementTableBody = document.querySelector('#placement-table-body');
+    placementTableBody.innerHTML = ''; // Clear any previous recommendations
+
+    placements.forEach(placement => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${placement.itemId}</td>
+        <td>${placement.itemName}</td>
+        <td>${placement.containerId}</td>
+        <td>${
+          placement.position?.startCoordinates
+            ? `W:${placement.position.startCoordinates.width}, D:${placement.position.startCoordinates.depth}, H:${placement.position.startCoordinates.height}`
+            : 'N/A'
+        }</td>
+        <td>${
+          placement.position?.endCoordinates
+            ? `W:${placement.position.endCoordinates.width}, D:${placement.position.endCoordinates.depth}, H:${placement.position.endCoordinates.height}`
+            : 'N/A'
+        }</td>
+        <td>${placement.retrieval_step}</td>
+      `;
+      placementTableBody.appendChild(row);
+    });
+  }
+
+  const fileInput = document.getElementById('items-file');
+  const previewTableBody = document.querySelector('#items-preview-body');
+  const noPlacementsMessage = document.getElementById('no-placements-message');
+
+  // Handle form submission
+  document.getElementById('upload-items-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.target);
+
+    try {
+      const response = await fetch('/api/csv/upload/items', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (result.status === 'success') {
+        // Fetch the updated list of items from the response and display them
+        displayItems(result.items);  
+        /// Show the items in the preview table
+      } else {
+        alert(result.message || 'Unable to upload items.');
+      }
+    } catch (error) {
+      console.error('Error uploading items:', error);
+    }
+  });
+
+  // Function to display items in the preview table
+  function displayItems(items) {
+    previewTableBody.innerHTML = ''; // Clear any previous previews
+
+    if (items.length > 0) {
+      // Remove the "no placements" message when there are items
+      noPlacementsMessage.style.display = 'none';
+
+      items.forEach(item => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${item.itemId}</td>
+          <td>${item.name}</td>
+          <td>${item.width} cm</td>
+          <td>${item.depth} cm</td>
+          <td>${item.height} cm</td>
+        `;
+        previewTableBody.appendChild(row);
+      });
+    } else {
+      // Show the "no placements" message if no items were uploaded or found
+      noPlacementsMessage.style.display = 'block';
+    }
+  }
+
+  const starsContainer = document.getElementById('stars');
+  const numStars = 100; // Number of stars
+
+  for (let i = 0; i < numStars; i++) {
+    const star = document.createElement('div');
+    star.classList.add('star');
+    star.style.top = Math.random() * 100 + '%'; // Random vertical position
+    star.style.left = Math.random() * 100 + '%'; // Random horizontal position
+    starsContainer.appendChild(star);
+  }
+</script>

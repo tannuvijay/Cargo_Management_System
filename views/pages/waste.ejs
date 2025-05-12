@@ -1,0 +1,253 @@
+<% include('../layouts/main.ejs') %>
+<style>
+  /* General Reset */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  /* Background styling */
+  body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  margin: 0;
+  font-family: 'Arial', sans-serif;
+  background: radial-gradient(circle, #011307, #001736);
+  overflow-y: auto;
+}
+
+  /* Starry Background */
+  .stars {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  /* Shining stars effect */
+  .star {
+    width: 3px;
+    height: 3px;
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+    opacity: 0.8;
+    animation: twinkling 2s infinite ease-in-out;
+  }
+
+  @keyframes twinkling {
+    0%, 100% {
+      opacity: 0.4;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  /* Header Text Styling */
+  h2 {
+    font-size: 28px;
+    color: #dacbcb;
+    margin: 40px 0 20px;
+    font-weight: bold;
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.7);
+    text-align: center;
+  }
+
+  /* Enhanced Table Styling */
+  table {
+    width: 90%;
+    margin: 0 auto;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 20px;
+    background-color: #1a2639;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    font-size: 15px;
+  }
+
+  thead {
+    background-color: #0066cc;
+  }
+
+  th {
+    color: #ffffff;
+    padding: 14px 16px;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid #2c3e50;
+  }
+
+  td {
+    padding: 12px 15px;
+    color: #e0e0e0;
+    text-align: center;
+    background-color: rgba(26, 38, 57, 0.9);
+  }
+
+  tbody tr:nth-child(even) td {
+    background-color: rgba(34, 48, 72, 0.9);
+  }
+
+  tbody tr:hover td {
+    background-color: rgba(255, 255, 255, 0.05);
+    transition: background-color 0.3s ease;
+  }
+
+  .btn {
+    padding: 10px 20px;
+    margin: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+
+  .btn-danger {
+    background-color: #dc3545;
+    color: white;
+  }
+
+  .btn-secondary {
+    background-color: #6c757d;
+    color: white;
+  }
+
+  .alert {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 15px;
+    border-radius: 5px;
+  }
+
+  .alert-info {
+    background-color: rgba(23, 162, 184, 0.2);
+    color: #17a2b8;
+    border: 1px solid #17a2b8;
+  }
+
+  .page-wrapper {
+  flex: 1; /* This makes the content area expand to fill available space */
+  padding: 20px;
+  position: relative;
+}
+
+/* Footer stays at the bottom */
+footer {
+  text-align: center;
+  font-size: 14px;
+  color: white;
+  padding: 10px 0;
+  background: transparent;
+}
+
+  .mt-4.text-center {
+    text-align: center;
+    margin-top: 30px;
+  }
+</style>
+
+<section>
+  <div class="stars" id="stars"></div>
+  <h2>Waste Management</h2>
+
+  <!-- Waste Table -->
+  <table id="waste-table" style="display: none;">
+    <thead>
+      <tr>
+        <th>Item ID</th>
+        <th>Name</th>
+        <th>Reason</th>
+      </tr>
+    </thead>
+    <tbody id="waste-items-body">
+      <!-- Waste items will be populated here -->
+    </tbody>
+  </table>
+
+  <!-- Buttons for Waste Management -->
+  <div class="mt-4 text-center">
+    <button id="identify-waste" class="btn btn-danger">Identify Waste</button>
+    <button id="return-waste" class="btn btn-secondary">Get Return Plan</button>
+  </div>
+
+  <!-- Results Section -->
+  <div id="waste-result" class="mt-4 text-center alert alert-info" style="display: none;"></div>
+
+  <footer>&copy; 2025 Waste Management System</footer>
+</section>
+
+<script>
+  // Initialize Stars Animation
+  const starsContainer = document.getElementById('stars');
+  const numStars = 100;
+  for (let i = 0; i < numStars; i++) {
+    const star = document.createElement('div');
+    star.classList.add('star');
+    star.style.top = Math.random() * 100 + '%';
+    star.style.left = Math.random() * 100 + '%';
+    starsContainer.appendChild(star);
+  }
+
+  // Identify Waste
+  document.getElementById("identify-waste").addEventListener("click", async () => {
+    try {
+      const response = await fetch('/api/waste/waste-items');
+      const data = await response.json();
+      console.log("Response data:", data);
+
+      const resultDiv = document.getElementById("waste-result");
+      const wasteTable = document.getElementById("waste-table");
+      const wasteItemsBody = document.getElementById("waste-items-body");
+
+      wasteItemsBody.innerHTML = '';
+
+      if (data.success && data.wasteItems.length > 0) {
+        data.wasteItems.forEach(waste => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${waste.itemId}</td>
+            <td>${waste.name}</td>
+            <td>${waste.reason}</td>
+          `;
+          wasteItemsBody.appendChild(row);
+        });
+        wasteTable.style.display = 'table';
+        resultDiv.style.display = "none";
+      } else {
+        console.log("No waste items found in the response.");
+        resultDiv.style.display = "block";
+        resultDiv.innerText = "No waste items found.";
+        wasteTable.style.display = 'none';
+      }
+    } catch (error) {
+      console.error('Error fetching waste items:', error);
+    }
+  });
+
+  // Return Waste Plan
+  document.getElementById("return-waste").addEventListener("click", async () => {
+    try {
+      const response = await fetch('/api/waste/return-plan');
+      const data = await response.json();
+      const resultDiv = document.getElementById("waste-result");
+      resultDiv.style.display = "block";
+      resultDiv.innerText = JSON.stringify(data, null, 2);
+    } catch (error) {
+      console.error('Error fetching return plan:', error);
+    }
+  });
+</script>

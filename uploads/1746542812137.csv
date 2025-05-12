@@ -1,0 +1,21 @@
+Item ID,Name,Width (cm),Depth (cm),Height (cm),Mass (kg),Priority (1-100),Expiry Date (ISO Format),Usage Limit,Preferred Zone
+001,Food Packet,10,10,20,5,80,2025-05-20,30 uses,Crew Quarters
+002,Oxygen Cylinder,15,15,50,30,95,N/A,100 uses,Airlock
+003,Medical Kit,12,12,25,10,90,2026-02-15,50 uses,Laboratory
+004,Tool Kit,25,25,40,15,70,N/A,20 uses,Engineering
+005,Water Bottle,10,10,30,2,85,2024-12-10,10 uses,Crew Quarters
+006,Food Packet,10,10,20,5,80,2025-05-20,30 uses,Crew Quarters
+007,Oxygen Cylinder,15,15,50,30,95,N/A,100 uses,Airlock
+008,Medical Kit,12,12,25,10,90,2026-02-15,50 uses,Laboratory
+009,Tool Kit,25,25,40,15,70,N/A,20 uses,Engineering
+010,Water Bottle,10,10,30,2,85,2024-12-10,10 uses,Crew Quarters
+011,Food Packet,10,10,20,5,80,2025-05-20,30 uses,Crew Quarters
+012,Oxygen Cylinder,15,15,50,30,95,N/A,100 uses,Airlock
+013,Medical Kit,12,12,25,10,90,2026-02-15,50 uses,Laboratory
+014,Tool Kit,25,25,40,15,70,N/A,20 uses,Engineering
+015,Water Bottle,10,10,30,2,85,2024-12-10,10 uses,Crew Quarters
+016,Food Packet,10,10,20,5,80,2025-05-20,30 uses,Crew Quarters
+017,Oxygen Cylinder,15,15,50,30,95,N/A,100 uses,Airlock
+018,Medical Kit,12,12,25,10,90,2026-02-15,50 uses,Laboratory
+019,Tool Kit,25,25,40,15,70,N/A,20 uses,Engineering
+020,Water Bottle,10,10,30,2,85,2024-12-10,10 uses,Crew Quarters
